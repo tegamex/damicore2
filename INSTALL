@@ -36,7 +36,9 @@ For installation, the following software tools are needed
 * python 2.7
 * igraph library (visit http://igraph.org/c for more informations)
 * python-igraph (visit http://igraph.org/python for more informations)
-* (Optional) munkres (`pip install 
+* (Optional) munkres:
+     $ sudo apt install pip
+     $ pip install munkres
 
 For execution, DamicorePy relies on compressor programs to calculate the 
 distance between a  pair of objects (files). Make sure the following tools
