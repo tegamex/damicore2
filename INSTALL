@@ -1,4 +1,3 @@
-
   INSTALLATION AND USAGE INSTRUCTION
  ==================================================
 
@@ -36,6 +35,7 @@ For installation, the following software tools are needed
 * python 2.7
 * igraph library (visit http://igraph.org/c for more informations)
 * python-igraph (visit http://igraph.org/python for more informations)
+* pycairo (visit https://cairographics.org/pycairo/ for more informations)
 * (Optional) munkres:
      $ sudo apt install pip
      $ pip install munkres
