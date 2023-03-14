@@ -68,9 +68,10 @@ if __name__ == '__main__':
   is_normalize_weights, is_normalize_matrix, num_clusters = (
       clustering_args['is_normalize_weights'],
       clustering_args['is_normalize_matrix'], clustering_args['num_clusters'])
-  community_detection_name, ncd_results = (
+  community_detection_name, ncd_results, simplification_step_name = (
       clustering_args['community_detection_name'],
-      clustering_args['ncd_results'])
+      clustering_args['ncd_results'],
+      clustering_args['simplification_step_name'])
       
   if ncd_results:
     factories = compressor = None
@@ -85,7 +86,8 @@ if __name__ == '__main__':
       is_normalize_matrix=is_normalize_matrix,
       num_clusters=num_clusters,
       community_detection_name=community_detection_name,
-      verbosity=verbosity)
+      verbosity=verbosity,
+      simplification_step_name=simplification_step_name)
   ncd_results, phylo_tree, tree_graph, leaf_ids, membership, clustering = (
       result['ncd_results'], result['phylo_tree'], result['tree_graph'],
       result['leaf_ids'], result['membership'], result['clustering'])

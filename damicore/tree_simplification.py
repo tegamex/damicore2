@@ -123,6 +123,36 @@ def neighbor_joining(m, ids=None):
   d = m[0][1]
   return join_neighbors(tree, 0, 1, d/2, d/2)[0]
 
+def get_tree(node, parent_dist, leaf_names):
+    """
+    Convert sciply.cluster.hierarchy.to_tree()-output to a Tree format.
+
+    :param node: output of sciply.cluster.hierarchy.to_tree()
+    :param parent_dist: output of sciply.cluster.hierarchy.to_tree().dist
+    :param leaf_names: list of leaf names
+    :returns: tree in Newick format
+    """
+    if node.is_leaf():
+        return Leaf(leaf_names[node.id])
+    else:
+        left_node  = get_tree(node.get_left(), node.dist, leaf_names)
+        right_node = get_tree(node.get_right(), node.dist, leaf_names)
+        return Node(None,Edge(right_node,node.dist-node.get_right().dist),Edge(left_node,node.dist-node.get_left().dist))
+    
+def agglomerative_clustering(m, ids=None, simplification_step_name='average-linkage'):
+  """Linkage algorithm.
+  
+      Given a distance matrix, the algorithm seeks a tree that approximates the
+  measured distances by greedily choosing to join the pair of elements that
+  minimize the total sum of edge lengths.
+  """
+  from scipy.cluster.hierarchy import linkage, to_tree
+  import scipy.spatial.distance as ssd
+  m = ssd.squareform(m)
+  linkage_matrix = linkage(m, simplification_step_name.split("-")[0])
+  tree = to_tree(linkage_matrix, False)
+  return get_tree(tree, tree.dist, ids)
+
 def _random_joining(ids):
   """Generates a tree by repeatedly joining elements randomly."""
   r = Random()

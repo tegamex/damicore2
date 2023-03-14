@@ -282,7 +282,7 @@ def tree_clustering(g, leaf_ids, community_detection_name='fast',
 
 def _pipeline(ncd_results,
     is_normalize_matrix=True, is_normalize_weights=True, num_clusters=None,
-    community_detection_name='fast', verbosity=0):
+    community_detection_name='fast', verbosity=0, simplification_step_name='nj'):
   
   results = list(ncd_results.get_results())
 
@@ -295,8 +295,11 @@ def _pipeline(ncd_results,
     normalized_results = [ncd.NcdResult(result, ncd=dist)
         for result, dist in zip(results, ds)]
     m, (ids,_) = ncd.to_matrix(normalized_results)
-
-  tree = nj.neighbor_joining(m, ids)
+  
+  if simplification_step_name == 'nj':
+    tree = nj.neighbor_joining(m, ids)
+  elif simplification_step_name in ['complete-linkage','single-linkage','average-linkage']:
+    tree = nj.agglomerative_clustering(m, ids, simplification_step_name)
 
   if verbosity >= 1:
     sys.stderr.write('Clustering elements...\n')
@@ -319,7 +322,7 @@ def _pipeline(ncd_results,
 def pipeline(factories=None, compressor=None, ncd_results=None,
     is_parallel=True,
     is_normalize_matrix=True, is_normalize_weights=True, num_clusters=None,
-    community_detection_name='fast', verbosity=0):
+    community_detection_name='fast', verbosity=0, simplification_step_name='nj'):
   if verbosity >= 1:
     if ncd_results: sys.stderr.write('Using already computed NCD distance matrix\n')
     else:           sys.stderr.write('Performing NCD distance matrix calculation...\n')
@@ -329,7 +332,7 @@ def pipeline(factories=None, compressor=None, ncd_results=None,
         is_parallel=is_parallel, verbosity=verbosity)
 
   return _pipeline(ncd_results, is_normalize_matrix, is_normalize_weights,
-      num_clusters, community_detection_name, verbosity)
+      num_clusters, community_detection_name, verbosity, simplification_step_name)
 
 def cli_parser():
   parser = argparse.ArgumentParser(add_help=False)
@@ -337,6 +340,8 @@ def cli_parser():
       'Options for clustering algorithms')
   group.add_argument('--source-mode', action='store_true',
       help='Calculate NCD distance matrix for the provided sources (default)')
+  group.add_argument('--simplification_step', choices=['nj','complete-linkage','single-linkage','average-linkage'],
+      default='nj', help='Select the tree simplification algorithm (default:nj)')
   group.add_argument('--matrix-mode', action='store_true',
       help='Uses an already calculated NCD matrix in raw format')
   group.add_argument('--normalize-matrix', action='store_true',
@@ -361,5 +366,6 @@ def parse_args(args):
       'is_normalize_matrix': args.normalize_matrix,
       'num_clusters': args.num_clusters,
       'community_detection_name': args.community_detection,
+      'simplification_step_name': args.simplification_step,
       'ncd_results': ncd_results,
       }
